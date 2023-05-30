@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/edf9b61c-45eb-4ff3-86f9-5ca5f4d33cd7/resourceGroups/base_de_datos/providers/Microsoft.Web/sites/djangoapirest",
+    "appService.deploySubpath": "."
+}
