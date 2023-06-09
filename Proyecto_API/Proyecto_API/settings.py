@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
+import os
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yjez)3o$(4ep%4kitadv)(6t%&rz*w!$#qz(egy$4auh(u^&s#'
+SECRET_KEY = os.environ.get('SECRET_KEY', default='your_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['djangoapirest.azurewebsites.net']
+ALLOWED_HOSTS = [os.environ.get('djangoapirest.azurewebsites.net')]
+
+
 
 
 # Application definition
@@ -39,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "whitenoise.runserver_nostatic",
     'api',
 ]
 
@@ -72,23 +78,18 @@ TEMPLATES = [
 ]
 
 
-
+WSGI_APPLICATION= 'Proyecto_API.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'DBTest',
-        'USER':'patricio',
-        'PASSWORD':'@pex1234LOL',
-        'HOST':'server-test-9000.database.windows.net',
-        'PORT':'1433',
-        'OPTIONS':{
-            'driver':'ODBC Driver 18 for SQL Server'
-        }
-    }
+
+DATABASES={ 
+    'default': dj_database_url.config(
+        default = 'mssqlms://patricio:@pex1234LOL@server-test-9000.database.windows.net:1433/DBTest',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )    
 }
 
 
@@ -126,10 +127,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = os.environ.get('DJANGO_STATIC_URL','/static/')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STARIC_ROOT = BASE_DIR / 'staticfiles'
+STARIC_ROOT = STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", "./static/") 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+
+if not DEBUG:
+    STARIC_ROOT= os.path.join(BASE_DIR,'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
